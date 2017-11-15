@@ -32,9 +32,7 @@ def create_gensim_dictionary(data_path, mecab_path=None, no_below=2, no_above=0.
                     while res:
                         arr = res.feature.split(",")
                         res = res.next
-                        if arr[0] != "名詞":
-                            continue
-                        elif len(arr[6]) == 1:
+                        if len(arr[6]) == 1:
                             continue
                         else:
                             word = arr[6]
@@ -57,7 +55,7 @@ def doc2vec(docs):
     model.build_vocab(sentences)
     model.train(sentences, total_examples=model.corpus_count, epochs=model.iter)
 
-    model.save("Data/model/doc2vec_dmpv.model")
+    model.save("Data/model/doc2vec_DBoW.model")
     
     return model
 
@@ -89,7 +87,7 @@ def kmeans(dense, docs_title, id2doc, start, end):
         labels = kmeans_model.labels_
         kmeans_inertia.append(kmeans_model.inertia_)
 
-        with open("Data/clustering/doc2vec/clustering_{0}_result.txt".format(cluster), "w") as f:
+        with open("Data/clustering/DBoW/clustering_{0}_result.txt".format(cluster), "w") as f:
             f.write("clustering {0} evaluation value : {1} \n".format(cluster, kmeans_inertia[cluster-2]))
             for id, label in enumerate(labels):
                 if label not in cluster_result[cluster].keys():
@@ -97,7 +95,7 @@ def kmeans(dense, docs_title, id2doc, start, end):
                 cluster_result[cluster][label].append(id2doc[id])
                 f.write("{0} is cluster {1} \n".format(id2doc[id], label))
 
-        with open("Data/clustering/doc2vec/clustering_result_{0}_list.txt".format(cluster), "w") as f:
+        with open("Data/clustering/DBoW/clustering_result_{0}_list.txt".format(cluster), "w") as f:
             f.write("clustering {0} result list\n".format(cluster))
             for cluster, docs in cluster_result[cluster].items():
                 f.write("\n\n[cluster {0}] : \n".format(cluster))
@@ -164,7 +162,7 @@ if __name__ == "__main__":
 
     print("# start")
 
-    docs, docs_title, dictionary = create_gensim_dictionary("/home/tamashiro/AI/OPC/LDAPython/Data/対応方法", mecab_path=" -d /usr/lib/mecab/dic/mecab-ipadic-neologd")
+    docs, docs_title, dictionary = create_gensim_dictionary("/home/tamashiro/AI/OPC/Data/対応方法", mecab_path=" -d /usr/lib/mecab/dic/mecab-ipadic-neologd")
     model = doc2vec(docs)
 
     dense, id2doc = doc2feature(model)
