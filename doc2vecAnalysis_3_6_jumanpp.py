@@ -19,10 +19,12 @@ def create_gensim_dictionary(data_path, no_below=2, no_above=0.1):
                 lines = f.readlines()
                 docs_title[docname] = lines[0]
                 for text in lines:
-                    if text.replace(" ","").replace("\n", "").replace("#", "").replace("@", "") != "":
-                        result = Jumanpp().analysis(text.replace(" ","").replace("\n", "").replace("#", "").replace("@", ""))
+                    text_replace = text.replace(" ","").replace("\n", "").replace("#", "").replace("@", "") 
+                    if text_replace != "":
+                        result = Jumanpp().analysis(text_replace)
                     for mrph in result.mrph_list():
-                        docs[docname].append(mrph.midasi)
+                        if len(mrph.midasi) > 1:
+                            docs[docname].append(mrph.midasi)
 
     dictionary = gensim.corpora.Dictionary(docs.values())
     dictionary.filter_extremes(no_below=no_below, no_above=no_above)

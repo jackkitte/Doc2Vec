@@ -32,9 +32,7 @@ def create_gensim_dictionary(data_path, mecab_path=None, no_below=2, no_above=0.
                     while res:
                         arr = res.feature.split(",")
                         res = res.next
-                        if len(arr[6]) == 1:
-                            continue
-                        else:
+                        if len(arr[6]) > 1:
                             word = arr[6]
                             docs[docname].append(word)
 
