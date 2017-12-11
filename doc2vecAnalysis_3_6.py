@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
+import unicodedata
 import pickle
 import MeCab
 import gensim
@@ -18,6 +20,7 @@ def create_gensim_dictionary(data_path, mecab_path=None, no_below=2, no_above=0.
     else:
         mecab = MeCab.Tagger(mecab_path)
 
+    mecab.parse('')
     for root, dirs, files in os.walk(data_path):
         print("# morphological analysis")
         docs = {}
@@ -28,12 +31,23 @@ def create_gensim_dictionary(data_path, mecab_path=None, no_below=2, no_above=0.
                 lines = f.readlines()
                 docs_title[docname] = lines[0]
                 for text in lines:
+                    text = re.sub(r'\n', '', text)
                     res = mecab.parseToNode(text)
                     while res:
                         arr = res.feature.split(",")
+                        res_sub = res
                         res = res.next
-                        if len(arr[6]) > 1:
+                        if re.match(r'^[0-9]{1,}$', unicodedata.normalize('NFKC', res_sub.surface)): # normalizeで全角数字を半角数字に変換
+                            continue
+                        if arr[0] == '記号' or arr[0] == 'BOS/EOS':
+                            continue
+                        elif arr[1] == '固有名詞' or arr[1] == '一般':
+                            word = res_sub.surface
+                            docs[docname].append(word)
+                        else:
                             word = arr[6]
+                            if word == '○': # 全角のゼロは半角にはならないらしい
+                                continue
                             docs[docname].append(word)
 
     dictionary = gensim.corpora.Dictionary(docs.values())
