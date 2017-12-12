@@ -36,8 +36,8 @@ def split_into_words(doc, name=''):
 def search_similar_texts(words):
     x = model.infer_vector(words)
     most_similar_texts = model.docvecs.most_similar([x])
-    for similar_text in most_similar_texts:
-        print(similar_text[0])
+    for similar_text, similarity in most_similar_texts:
+        print('{0} : {1} '.format(similar_text, similarity))
 
 def search_similar_words(words):
     for word in words:
@@ -47,8 +47,12 @@ def search_similar_words(words):
             print(result[0])
 
 if __name__ == '__main__':
-    print('文字列入力:')
-    search_str = input()
-    words = split_into_words(search_str).words
-    search_similar_texts(words)
-    search_similar_words(words)
+    while True:
+        print('文字列入力:', end='')
+        search_str = input()
+        words = split_into_words(search_str).words
+        search_similar_texts(words)
+        search_similar_words(words)
+        print('')
+        print('---次のクエリをどうぞ---')
+        print('')
